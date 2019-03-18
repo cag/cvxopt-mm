@@ -9,19 +9,29 @@ root.title('Convex Optimization Market Maker Simulation')
 app = ttk.Frame(root)
 app.pack()
 
-resetformframe = ttk.Frame(app)
-resetformframe.pack(side='left')
+lhsframe = ttk.Frame(app)
+lhsframe.pack(side='left')
 
-fundingframe = ttk.LabelFrame(app, text='funding')
-fundingframe.pack()
-funding = tk.StringVar()
-fundingentry = ttk.Entry(fundingframe, textvariable=funding)
-fundingentry.pack()
-resetbtn = ttk.Button(fundingframe, text='Reset',
-                      command=lambda: print('reset with', funding.get()))
+liquidityparamframe = ttk.LabelFrame(lhsframe, text='liquidity parameter')
+liquidityparamframe.pack()
+liquidityparam = tk.StringVar()
+liquidityparamentry = ttk.Entry(
+    liquidityparamframe, textvariable=liquidityparam)
+liquidityparamentry.pack()
+resetbtn = ttk.Button(
+    liquidityparamframe,
+    text='Reset',
+    command=lambda: print('reset with', liquidityparam.get()),
+)
 resetbtn.pack()
+lossboundframe = ttk.LabelFrame(liquidityparamframe, text='loss bound')
+lossboundframe.pack()
+lossbound = tk.StringVar()
+lossboundlabel = ttk.Label(
+    lossboundframe, textvariable=lossbound)
+lossboundlabel.pack()
 
-conditionsframe = ttk.LabelFrame(app, text='conditions')
+conditionsframe = ttk.LabelFrame(lhsframe, text='conditions')
 conditionsframe.pack(side='left')
 newconditionquestionlabel = ttk.Label(conditionsframe, text='question:')
 newconditionquestionlabel.pack()
@@ -48,25 +58,31 @@ addconditionbtn = ttk.Button(
 addconditionbtn.pack()
 conditionsview = ttk.Treeview(conditionsframe, show='tree')
 conditionsview.pack()
-conditionsview.heading('#0', text='conditions')
-cond1id = conditionsview.insert('', 'end', text='Fav letter?')
-conditionsview.insert(cond1id, 'end', text='a')
-conditionsview.insert(cond1id, 'end', text='b')
-conditionsview.insert(cond1id, 'end', text='c')
-cond2id = conditionsview.insert('', 'end', text='How to ...?')
-conditionsview.insert(cond2id, 'end', text='d')
-conditionsview.insert(cond2id, 'end', text='e')
-conditionsview.insert(cond2id, 'end', text='f')
-cond3id = conditionsview.insert('', 'end', text='Wat')
-conditionsview.insert(cond3id, 'end', text='x')
-conditionsview.insert(cond3id, 'end', text='y')
-conditionsview.insert(cond3id, 'end', text='z')
-conditionsview.insert(cond3id, 'end', text='w')
 
 outcomesframe = ttk.LabelFrame(app, text='outcomes')
-outcomesframe.pack(side='right')
+outcomesframe.pack()
 outcomesview = ttk.Treeview(outcomesframe, show='tree')
 outcomesview.pack()
+
+tradeframe = ttk.LabelFrame(outcomesframe, text='trade')
+tradeselectedoutcomeframe = ttk.LabelFrame(tradeframe, text='selected outcome')
+tradeselectedoutcomeframe.pack()
+tradeselectedoutcome = tk.StringVar()
+tradeselectedoutcomelabel = ttk.Label(
+    tradeselectedoutcomeframe, textvariable=tradeselectedoutcome)
+tradeselectedoutcomelabel.pack()
+tradeframe.pack()
+tradeamt = tk.StringVar()
+tradeamtentry = ttk.Entry(tradeframe, textvariable=tradeamt)
+tradeamtentry.pack()
+tradecostframe = ttk.LabelFrame(tradeframe, text='cost')
+tradecostframe.pack()
+tradecost = tk.StringVar()
+tradecostlabel = ttk.Label(tradecostframe, textvariable=tradecost)
+tradecostlabel.pack()
+tradebtn = ttk.Button(tradeframe, text='Trade',
+                      command=lambda: print('trade', tradeamt.get()))
+tradebtn.pack()
 
 
 app.mainloop()
