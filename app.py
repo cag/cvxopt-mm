@@ -1,11 +1,34 @@
+from collections import namedtuple
 import tkinter as tk
 from tkinter import ttk
 from cvxopt import solvers, matrix, spdiag, log
 
 
+Condition = namedtuple('Condition', ('question', 'outcomes'))
+
+
+liquidityparam = 1.0
+conditions = []
+
+
+def reset_liquidity_param():
+    global liquidityparamvar, liquidityparam
+    liquidityparam = float(liquidityparamvar.get())
+    liquidityparamvar.set(str(liquidityparam))
+
+
+def add_new_condition():
+    global newconditionquestionvar, newconditionoutcomesvar, conditions, conditionsview
+    question = newconditionquestionvar.get()
+    outcomes = [o.strip() for o in newconditionoutcomesvar.get().split(',')]
+    conditions.append(Condition(question, outcomes))
+    cid = conditionsview.insert('', 'end', text=question)
+    for outcome in outcomes:
+        conditionsview.insert(cid, 'end', text=outcome)
+
+
 root = tk.Tk()
 root.title('Convex Optimization Market Maker Simulation')
-
 app = ttk.Frame(root)
 app.pack()
 
@@ -14,55 +37,54 @@ lhsframe.pack(side='left')
 
 liquidityparamframe = ttk.LabelFrame(lhsframe, text='liquidity parameter')
 liquidityparamframe.pack()
-liquidityparam = tk.StringVar()
+liquidityparamvar = tk.StringVar()
 liquidityparamentry = ttk.Entry(
-    liquidityparamframe, textvariable=liquidityparam)
+    liquidityparamframe, textvariable=liquidityparamvar)
 liquidityparamentry.pack()
-resetbtn = ttk.Button(
-    liquidityparamframe,
-    text='Reset',
-    command=lambda: print('reset with', liquidityparam.get()),
-)
+resetbtn = ttk.Button(liquidityparamframe, text='Reset',
+                      command=reset_liquidity_param)
 resetbtn.pack()
 lossboundframe = ttk.LabelFrame(liquidityparamframe, text='loss bound')
 lossboundframe.pack()
-lossbound = tk.StringVar()
+lossboundvar = tk.StringVar()
 lossboundlabel = ttk.Label(
-    lossboundframe, textvariable=lossbound)
+    lossboundframe, textvariable=lossboundvar)
 lossboundlabel.pack()
 
 conditionsframe = ttk.LabelFrame(lhsframe, text='conditions')
 conditionsframe.pack(side='left')
 newconditionquestionlabel = ttk.Label(conditionsframe, text='question:')
 newconditionquestionlabel.pack()
-newconditionquestion = tk.StringVar()
+newconditionquestionvar = tk.StringVar()
 newconditionquestionentry = ttk.Entry(
-    conditionsframe, textvariable=newconditionquestion)
+    conditionsframe, textvariable=newconditionquestionvar)
 newconditionquestionentry.pack()
 newconditionoutcomeslabel = ttk.Label(conditionsframe, text='outcomes:')
 newconditionoutcomeslabel.pack()
-newconditionoutcomes = tk.StringVar()
+newconditionoutcomesvar = tk.StringVar()
 newconditionoutcomesentry = ttk.Entry(
-    conditionsframe, textvariable=newconditionoutcomes)
+    conditionsframe, textvariable=newconditionoutcomesvar)
 newconditionoutcomesentry.pack()
 addconditionbtn = ttk.Button(
     conditionsframe,
     text='Add condition',
-    command=lambda: print(
-        'add condition',
-        newconditionquestion.get(),
-        'with outcomes',
-        newconditionoutcomes.get()
-    )
+    command=add_new_condition
 )
 addconditionbtn.pack()
 conditionsview = ttk.Treeview(conditionsframe, show='tree')
 conditionsview.pack()
 
+
 outcomesframe = ttk.LabelFrame(app, text='outcomes')
 outcomesframe.pack()
 outcomesview = ttk.Treeview(outcomesframe, show='tree')
 outcomesview.pack()
+outcomesview.insert('', 'end', text='foo')
+for sequence in (
+    *outcomesview.event_info(),
+    '<Button-1>',
+):
+    outcomesview.bind(sequence, lambda e: print('something selected', e))
 
 tradeframe = ttk.LabelFrame(outcomesframe, text='trade')
 tradeselectedoutcomeframe = ttk.LabelFrame(tradeframe, text='selected outcome')
@@ -83,6 +105,5 @@ tradecostlabel.pack()
 tradebtn = ttk.Button(tradeframe, text='Trade',
                       command=lambda: print('trade', tradeamt.get()))
 tradebtn.pack()
-
 
 app.mainloop()
